@@ -20,13 +20,10 @@ jobs:
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
       with:
-        targets: x86_64-unknown-linux-musl
+        targets: x86_64-unknown-linux-musl,aarch64-unknown-linux-musl
 
     - name: Install cross
       run: cargo install cross
-
-    - name: Build release binary
-      run: cross build --release --target x86_64-unknown-linux-musl
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
@@ -37,9 +34,14 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Build and push image
+    - name: Build and push multi-arch image
       uses: docker/build-push-action@v6
       with:
         context: .
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+        platforms: linux/amd64,linux/arm64
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+        build-args: |
+          RUST_TARGET=x86_64-unknown-linux-musl
