@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: komeo-mqtt-cronjob
+  namespace: default
+spec:
+  schedule: '*/1 * * * *'
+  concurrencyPolicy: Allow
+  suspend: false
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+            - name: komeo-mqtt
+              image: jzacharie/komeo-mqtt:latest
+              env:
+                - name: MQTT_IP
+                  value: 192.168.0.115
+                - name: MQTT_PORT
+                  value: '1883'
+                - name: MQTT_USER
+                  value: joseph
+                - name: MQTT_PASS
+                  value: secret
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: IfNotPresent
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext: {}
+          schedulerName: default-scheduler
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
