@@ -1,5 +1,5 @@
 # Use a recent Rust image with Cargo 1.73+ (compatible with lock file v4)
-FROM rust:1.73 as builder
+FROM rust:1.87 as builder
 
 # Install cmake, musl-tools, and other dependencies for static compilation
 RUN apt-get update && apt-get install -y cmake musl-tools pkg-config libssl-dev
