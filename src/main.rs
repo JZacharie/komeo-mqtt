@@ -20,7 +20,9 @@ fn main() -> Result<()> {
     let mut stream = TcpStream::connect(format!("{}:23", komeo_ip))
         .context("Failed to connect to Komeo device")?;
 
-    let message = b"{"1234567": { "msgId": 5, "read": ["status", "wear", "pressure", "waterFlow", "flow", "consumption", "about"]}}";
+    //let message = b"{"1234567": { "msgId": 5, "read": ["status", "wear", "pressure", "waterFlow", "flow", "consumption", "about"]}}";
+    let message = br#"{"1234567": { "msgId": 5, "read": ["status", "wear", "pressure", "waterFlow", "flow", "consumption", "about"]}}"#;
+
     stream.write_all(message)?;
 
     let mut buffer = vec![0; 2048];
