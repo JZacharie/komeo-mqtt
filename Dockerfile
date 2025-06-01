@@ -1,29 +1,36 @@
-# Use a recent Rust image with Cargo 1.73+ (compatible with lock file v4)
+# Use a recent Rust image with Cargo 1.73+ (compatible with Cargo.lock version 4)
 FROM rust:1.87 as builder
 
-# Install cmake, musl-tools, and other dependencies for static compilation
+# Install build dependencies for static compilation: cmake, musl-tools, pkg-config, libssl-dev
 RUN apt-get update && apt-get install -y cmake musl-tools pkg-config libssl-dev
 
-# Add the musl target for static linking
-RUN rustup target add x86_64-unknown-linux-musl
+# Add musl targets for static linking on amd64 and arm64 architectures
+RUN rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 
-# Set working directory inside the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy source code into the container
+# Copy the entire source code into the container
 COPY . .
 
-# Build release for musl target to get a static binary
+# Build the project in release mode for x86_64 (amd64) musl target
 RUN cargo build --release --target x86_64-unknown-linux-musl
 
-# Final stage: lightweight alpine image
+# Build the project in release mode for aarch64 (arm64) musl target
+RUN cargo build --release --target aarch64-unknown-linux-musl
+
+# Start a minimal Alpine Linux image for the final image
 FROM alpine:3.20
 
-# Install CA certificates (needed for HTTPS if used, e.g. MQTT TLS)
+# Install CA certificates (necessary for HTTPS/TLS support, e.g., MQTT over TLS)
 RUN apk add --no-cache ca-certificates
 
-# Copy the built binary from the builder stage
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/komeo-mqtt /usr/local/bin/komeo-mqtt
+# Copy the compiled binary for amd64 architecture from the builder stage
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/komeo-mqtt /usr/local/bin/komeo-mqtt-amd64
 
-# Set the binary as the entrypoint
-ENTRYPOINT ["/usr/local/bin/komeo-mqtt"]
+# Copy the compiled binary for arm64 architecture from the builder stage
+COPY --from=builder /app/target/aarch64-unknown-linux-musl/release/komeo-mqtt /usr/local/bin/komeo-mqtt-arm64
+
+# Default entrypoint uses the amd64 binary
+# When used in a multi-arch manifest, Docker will automatically select the appropriate binary for the platform
+ENTRYPOINT ["/usr/local/bin/komeo-mqtt-amd64"]
