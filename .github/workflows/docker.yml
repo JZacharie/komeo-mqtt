@@ -39,12 +39,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Replace / with - in platform string for tag
+        id: tagname
+        run: echo "TAG=${{ matrix.platform//\//- }}" >> $GITHUB_ENV
+        # Alternative portable bash:
+        # run: echo "TAG=$(echo '${{ matrix.platform }}' | sed 's/\//-/g')" >> $GITHUB_ENV
+
       - name: Build and push multi-arch Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.platform//\//- }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
           build-args: |
             TARGET=${{ matrix.target }}
+
