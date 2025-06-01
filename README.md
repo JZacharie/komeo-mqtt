@@ -1,5 +1,5 @@
 
-# 🧠 Komeo MQTT Exporter
+# 🧠 [Komeo](https://www.comapwt.com/komeo/#menu_decouvrez) MQTT Exporter
 
 ![Build](https://img.shields.io/github/actions/workflow/status/your-org/komeo-mqtt/docker.yml?branch=main&label=build)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
