@@ -1,5 +1,5 @@
 # Stage 1: Builder
-FROM rust:1.87 as builder
+FROM rust:1.90 as builder
 
 RUN apt-get update && apt-get install -y cmake musl-tools pkg-config libssl-dev
 
