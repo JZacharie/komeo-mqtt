@@ -11,7 +11,7 @@ COPY . .
 RUN cargo build --release --target ${TARGET}
 
 # Stage 2: Runtime
-FROM alpine:3.20
+FROM alpine:3.22
 RUN apk add --no-cache ca-certificates
 
 ARG TARGET
