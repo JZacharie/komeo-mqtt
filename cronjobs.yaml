@@ -20,13 +20,13 @@ spec:
               image: jzacharie/komeo-mqtt:latest
               env:
                 - name: MQTT_IP
-                  value: 192.168.0.115
+                  value: your_mqtt_ip
                 - name: MQTT_PORT
                   value: '1883'
                 - name: MQTT_USER
-                  value: joseph
+                  value: your_mqtt_user
                 - name: MQTT_PASS
-                  value: secret
+                  value: your_mqtt_password
               resources: {}
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
